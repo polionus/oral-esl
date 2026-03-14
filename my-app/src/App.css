@@ -1,0 +1,59 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 12px;
+}
+
+.text-field {
+  width: 400px;
+  max-width: 90vw;
+  padding: 14px 18px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 0.25s;
+}
+
+.text-field::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.text-field:focus {
+  border-color: var(--accent);
+}
+
+.submit-btn {
+  padding: 12px 40px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.25s, transform 0.15s;
+}
+
+.submit-btn:hover {
+  opacity: 0.85;
+}
+
+.submit-btn:active {
+  transform: scale(0.97);
+}
