@@ -1,0 +1,4 @@
+google-generativeai
+tyro
+diffusers
+torch
