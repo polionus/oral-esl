@@ -1,19 +1,24 @@
+import os
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+
 import pytesseract
 from PIL import Image
 import torch
-from diffusers import StableDiffusionPipeline
 from dataclasses import dataclass
 import tyro
 import google.generativeai as genai
-import os
 
-# Initialize the client
-os.environ["GEMINI_API_KEY"] = 'AIzaSyCeDacvZQcLlsurzIUwwQrIvm2GvMDLzdg'
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# Initialize the client (API key from .env)
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMIMI_API_KEY")
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 1. Point to the Tesseract executable (Homebrew default path)
-pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/bin/tesseract'
+# 1. Point to the Tesseract executable (Homebrew default path on macOS; Linux uses PATH)
+_tesseract_path = r'/opt/homebrew/bin/tesseract'
+if os.path.exists(_tesseract_path):
+    pytesseract.pytesseract.tesseract_cmd = _tesseract_path
 
 
 SYSTEM_PROMOPT_ENGLISH = '''
@@ -40,12 +45,6 @@ def call_gemini(text:str, system_prompt: str):
     
     final_text = system_prompt + text
     return model.generate_content(final_text)
-
-# Initialize the client
-os.environ["GEMINI_API_KEY"] = 'AIzaSyCeDacvZQcLlsurzIUwwQrIvm2GvMDLzdg'
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-2.5-flash')
-
 
 def extract_prompt(text: str):
 

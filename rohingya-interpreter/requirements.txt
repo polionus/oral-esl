@@ -1,6 +1,9 @@
 # Rohingya Translation Interpreter - RAG-based
 # Python 3.10+
 
+# Pin NumPy <2 for scipy/sklearn compatibility (sentence-transformers stack)
+numpy<2
+
 # LLM client (OpenAI-compatible, works with Ollama)
 openai>=1.0.0
 

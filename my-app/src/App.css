@@ -338,6 +338,165 @@ h1 {
   font-style: italic;
 }
 
+.phrase-hint {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+.phrase-card {
+  height: 140px;
+}
+
+.phrase-rohingya {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  padding: 12px;
+  line-height: 1.4;
+}
+
+.phrase-english {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+  text-align: center;
+  padding: 12px;
+  line-height: 1.4;
+}
+
+.upload-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.upload-area {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.translation-text-field {
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-h);
+  text-align: center;
+}
+
+.translation-text-field::placeholder {
+  color: var(--text);
+}
+
+.rohingya-translation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 24px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+}
+
+.rohingya-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.rohingya-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  cursor: default;
+}
+
+.rohingya-loading .rohingya-text {
+  color: var(--text);
+  font-weight: 500;
+  animation: rohingya-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes rohingya-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 56px;
+  background: var(--bg);
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-h);
+  transition: border-color 0.25s, background 0.25s, transform 0.15s;
+}
+
+.upload-trigger:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  transform: scale(1.02);
+}
+
+.upload-trigger svg {
+  width: 64px;
+  height: 64px;
+  color: var(--accent);
+}
+
+.upload-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-preview img {
+  max-width: 320px;
+  max-height: 320px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  object-fit: contain;
+}
+
+.upload-again {
+  padding: 10px 20px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--accent);
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.upload-again:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
 @media (max-width: 480px) {
   .flashcard-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -350,5 +509,24 @@ h1 {
 
   .flashcard-emoji {
     font-size: 2.4rem;
+  }
+
+  .phrase-card {
+    height: 100px;
+  }
+
+  .phrase-rohingya,
+  .phrase-english {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .upload-trigger {
+    padding: 36px 40px;
+  }
+
+  .upload-preview img {
+    max-width: 100%;
+    max-height: 280px;
   }
 }

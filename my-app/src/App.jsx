@@ -12,7 +12,11 @@ function useTTS(engine) {
     const url = `/api/tts?text=${encodeURIComponent(text)}&engine=${engine}`
     const audio = new Audio(url)
     audioRef.current = audio
-    audio.play().catch(() => {})
+    return new Promise((resolve) => {
+      audio.onended = () => resolve()
+      audio.onerror = () => resolve()
+      audio.play().catch(() => resolve())
+    })
   }, [engine])
 
   return speak
@@ -139,6 +143,13 @@ const restaurantOptions = [
   },
 ]
 
+const groceryPhrases = [
+  { id: 'want-buy', rohingya: 'Áñi ... bishit saiyúm.', english: 'I want to buy....' },
+  { id: 'where-find', rohingya: 'Áñi ... khúñdi faimú?', english: 'Where can I find....' },
+  { id: 'how-much', rohingya: '... ór dám hoót?', english: 'How much does ... cost?' },
+  { id: 'one-kilo', rohingya: 'Ek kilo ..., meherbaní gori.', english: '1 kilo ..., please.' },
+]
+
 const groceryFlashcards = [
   { id: 'meat', emoji: '🥩', english: 'Meat', translation: 'Gusśó', pronunciation: 'Goos-sho' },
   { id: 'halal', emoji: '🍖', english: 'Halal', translation: 'Halal', pronunciation: 'Same as English/Arabic' },
@@ -146,7 +157,7 @@ const groceryFlashcards = [
   { id: 'rice-uncooked', emoji: '🌾', english: 'Rice (uncooked)', translation: 'Saul', pronunciation: 'Sha-ool' },
   { id: 'noodles', emoji: '🍝', english: 'Spaghetti/Noodles', translation: 'Núdhul', pronunciation: 'Noo-dhul' },
   { id: 'orange', emoji: '🍊', english: 'Orange', translation: 'Komola', pronunciation: 'Ko-mo-la' },
-  { id: 'fruit', emoji: '🍎', english: 'Fruit', translation: 'Gula', pronunciation: 'Goo-la' },
+  { id: 'fruit', emoji: '🍎', english: 'Apple', translation: 'Sep', pronunciation: 'Sep Goo-la' },
   { id: 'vegetable', emoji: '🥬', english: 'Vegetable', translation: 'Torkari / Hóñsa', pronunciation: 'Tor-ka-ree / Hon-sha' },
   { id: 'bread', emoji: '🍞', english: 'Bread', translation: 'Ruti / Fira', pronunciation: 'Roo-tee / Fee-ra' },
 ]
@@ -160,7 +171,7 @@ function FlashCard({ card, speak }) {
       onClick={() => {
         if (!flipped) {
           setFlipped(true)
-          speak(card.english)
+          speak(card.english).then(() => speak(card.translation))
         } else {
           setFlipped(false)
         }
@@ -174,6 +185,34 @@ function FlashCard({ card, speak }) {
           <span className="flashcard-english">{card.english}</span>
           <span className="flashcard-translation">{card.translation}</span>
           <span className="flashcard-pronunciation">{card.pronunciation}</span>
+        </div>
+      </div>
+    </button>
+  )
+}
+
+function PhraseCard({ phrase, speak }) {
+  const [flipped, setFlipped] = useState(false)
+
+  return (
+    <button
+      className={`flashcard phrase-card ${flipped ? 'flipped' : ''}`}
+      onMouseEnter={() => speak(flipped ? phrase.english : phrase.rohingya)}
+      onClick={() => {
+        if (!flipped) {
+          setFlipped(true)
+          speak(phrase.english)
+        } else {
+          setFlipped(false)
+        }
+      }}
+    >
+      <div className="flashcard-inner">
+        <div className="flashcard-front">
+          <span className="phrase-rohingya">{phrase.rohingya}</span>
+        </div>
+        <div className="flashcard-back">
+          <span className="phrase-english">{phrase.english}</span>
         </div>
       </div>
     </button>
@@ -198,8 +237,47 @@ function TTSToggle({ useElevenLabs, onToggle }) {
 function App() {
   const [screen, setScreen] = useState('home')
   const [useElevenLabs, setUseElevenLabs] = useState(false)
+  const [uploadedImage, setUploadedImage] = useState(null)
+  const [translationText, setTranslationText] = useState(null)
+  const [rohingyaTranslation, setRohingyaTranslation] = useState(null)
+  const [isTranslating, setIsTranslating] = useState(false)
+  const fileInputRef = useRef(null)
   const engine = useElevenLabs ? 'elevenlabs' : 'gtts'
   const speak = useTTS(engine)
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+
+    const url = URL.createObjectURL(file)
+    setUploadedImage(url)
+    setTranslationText(null)
+    setRohingyaTranslation(null)
+    setIsTranslating(true)
+
+    const formData = new FormData()
+    formData.append('image', file)
+
+    try {
+      const res = await fetch('/api/image/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (res.ok && data.result) {
+        if (data.result.text != null) setTranslationText(data.result.text)
+        if (data.result.rohingya) setRohingyaTranslation(data.result.rohingya)
+      } else if (!res.ok) {
+        console.error('Upload failed:', data.error)
+      }
+    } catch (err) {
+      console.error('Upload error:', err)
+    } finally {
+      setIsTranslating(false)
+    }
+
+    e.target.value = ''
+  }
 
   if (screen === 'doctor') {
     return (
@@ -288,6 +366,31 @@ function App() {
     )
   }
 
+  if (screen === 'grocery-phrases') {
+    return (
+      <div className="container">
+        <TTSToggle useElevenLabs={useElevenLabs} onToggle={() => setUseElevenLabs(!useElevenLabs)} />
+        <button className="back-btn" onClick={() => setScreen('groceries')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+        <div className="title-icon">
+          <span className="icon-mask" style={{ WebkitMaskImage: 'url(/talking.png)', maskImage: 'url(/talking.png)' }} />
+        </div>
+        <span className="pointing-hand" role="img" aria-label="point down">👇</span>
+        <p className="phrase-hint">Tap a card to see the English</p>
+        <div className="flashcard-grid">
+          {groceryPhrases.map((phrase) => (
+            <PhraseCard key={phrase.id} phrase={phrase} speak={speak} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   if (screen === 'grocery-flashcards') {
     return (
       <div className="container">
@@ -311,6 +414,81 @@ function App() {
     )
   }
 
+  if (screen === 'camera') {
+    return (
+      <div className="container">
+        <TTSToggle useElevenLabs={useElevenLabs} onToggle={() => setUseElevenLabs(!useElevenLabs)} />
+        <button className="back-btn" onClick={() => { setScreen('home'); setUploadedImage(null); setTranslationText(null); setRohingyaTranslation(null); setIsTranslating(false); if (uploadedImage) URL.revokeObjectURL(uploadedImage); }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+        <div className="title-icon">
+          {categories.find(c => c.id === 'camera').icon}
+        </div>
+        <span className="pointing-hand" role="img" aria-label="point down">👇</span>
+        <div className="upload-area">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="upload-input"
+            aria-label="Upload image"
+          />
+          {uploadedImage ? (
+            <div className="upload-preview">
+              <img src={uploadedImage} alt="Your upload" />
+              {(translationText || isTranslating) && (
+                <input
+                  type="text"
+                  className="translation-text-field"
+                  value={translationText ?? ''}
+                  readOnly
+                  placeholder={isTranslating ? 'Retrieving...' : ''}
+                  aria-label="Translated text"
+                />
+              )}
+              {isTranslating ? (
+                <div className="rohingya-translation rohingya-loading">
+                  <span className="rohingya-text">Retrieving translation...</span>
+                </div>
+              ) : rohingyaTranslation ? (
+                <div className="rohingya-translation">
+                  <span className="rohingya-label">Rohingya:</span>
+                  <span className="rohingya-text" onMouseEnter={() => speak(rohingyaTranslation)}>
+                    {rohingyaTranslation}
+                  </span>
+                </div>
+              ) : null}
+              <button
+                className="upload-again"
+                onClick={() => fileInputRef.current?.click()}
+                onMouseEnter={() => speak('sóbi')}
+              >
+                Change image
+              </button>
+            </div>
+          ) : (
+            <button
+              className="upload-trigger"
+              onClick={() => fileInputRef.current?.click()}
+              onMouseEnter={() => speak('sóbi')}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              <span>Upload an image</span>
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   if (screen === 'groceries') {
     return (
       <div className="container">
@@ -328,7 +506,7 @@ function App() {
         <span className="pointing-hand" role="img" aria-label="point down">👇</span>
         <div className="sub-grid">
           {groceryOptions.map((opt) => (
-            <button key={opt.id} className="category-item" onClick={() => opt.id === 'grocery-items' ? setScreen('grocery-flashcards') : console.log(opt.id)} onMouseEnter={() => speak(opt.label)}>
+            <button key={opt.id} className="category-item" onClick={() => opt.id === 'grocery-items' ? setScreen('grocery-flashcards') : opt.id === 'grocery-conversation' ? setScreen('grocery-phrases') : console.log(opt.id)} onMouseEnter={() => speak(opt.label)}>
               <div className="category-circle">
                 {opt.icon}
               </div>
@@ -356,6 +534,7 @@ function App() {
               else if (cat.id === 'doctor') setScreen('doctor')
               else if (cat.id === 'restaurant') setScreen('restaurant')
               else if (cat.id === 'navigation') setScreen('navigation')
+              else if (cat.id === 'camera') setScreen('camera')
               else console.log(cat.id)
             }}
           >
