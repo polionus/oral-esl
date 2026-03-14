@@ -1,0 +1,9 @@
+# Rohingya Translation Interpreter - RAG-based
+# Python 3.10+
+
+# LLM client (OpenAI-compatible, works with Ollama)
+openai>=1.0.0
+
+# Vector store and embeddings
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
