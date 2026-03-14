@@ -1,0 +1,208 @@
+{
+  "language": "Rohingya",
+  "iso_code": "rhg",
+  "family": "Indo-Aryan (Bengali-Assamese branch)",
+  "scripts": [
+    {"name": "Rohingyalish", "type": "Latin-based", "note": "Most widely used for digital communication"},
+    {"name": "Hanifi", "type": "Unique script", "note": "Created specifically for Rohingya"},
+    {"name": "Fonna", "type": "Arabic-based", "note": "Based on Arabic alphabet"}
+  ],
+
+  "word_order": "SOV (Subject - Object - Verb)",
+  "word_order_examples": [
+    {"rohingya": "Ãi hana hair.", "english": "I food eat.", "gloss": "I am eating food."},
+    {"rohingya": "Hite hibare dekkil.", "english": "He her saw.", "gloss": "He saw her."},
+    {"rohingya": "Anware kitabwa fore.", "english": "Anwar book read.", "gloss": "Anwar read the book."}
+  ],
+
+  "pronouns": {
+    "personal": {
+      "1st_singular": {"ergative": "ãi", "genitive": "ãr", "dative": "ãre", "ablative": "ãttu", "benefactive": "ãlla"},
+      "2nd_singular_non_honorific": {"ergative": "tui", "genitive": "tor", "dative": "tore", "ablative": "tottu", "benefactive": "tolla"},
+      "2nd_singular_honorific": {"ergative": "tũi", "genitive": "tũwar", "dative": "tũware", "ablative": "tũwattu", "benefactive": "tũwalla"},
+      "3rd_singular_masculine": {"ergative": "hite", "genitive": "hitar", "dative": "hitare", "ablative": "hitattu", "benefactive": "hitalla"},
+      "3rd_singular_feminine": {"ergative": "hiba", "genitive": "hibar", "dative": "hibare", "ablative": "hibattu", "benefactive": "hiballa"},
+      "1st_plural": {"ergative": "ãra", "genitive": "ãrar", "dative": "ãrare", "ablative": "ãrattu", "benefactive": "ãralla"},
+      "2nd_plural": {"ergative": "tũwara", "genitive": "tũwarar", "dative": "tũwarare", "ablative": "tũwarattu", "benefactive": "tũwaralla"},
+      "3rd_plural": {"ergative": "hitara", "genitive": "hitarar", "dative": "hitarare", "ablative": "hitarattu", "benefactive": "hitaralla"}
+    },
+    "demonstrative": {
+      "near_singular_NC1": "iba",
+      "near_singular_NC2": "iyan",
+      "near_plural": "iin",
+      "far_singular_NC1": "hiba",
+      "far_singular_NC2": "hiyan",
+      "far_plural": "uin"
+    },
+    "relative": {
+      "singular": {"ergative": "ze", "genitive": "zar", "dative": "zare", "ablative": "zattu", "benefactive": "zalla"},
+      "plural": {"ergative": "zara", "genitive": "zarar", "dative": "zarare", "ablative": "zarattu", "benefactive": "zaralla"}
+    }
+  },
+
+  "noun_classes": {
+    "description": "Rohingya has two noun classes based on animacy. Classifiers attach as suffixes.",
+    "NC1": {
+      "label": "Animate (humans, animals, plants, manipulated objects like books/pens)",
+      "singular_definite_suffix": "-wa",
+      "plural_definite_suffix": "-un",
+      "singular_indefinite": "ekzon (humans) / uggwa (others)",
+      "plural_indefinite": "okkol",
+      "examples": [
+        {"bare": "manuš", "definite_sg": "manuššwa", "definite_pl": "manuššun", "english": "man"},
+        {"bare": "fúl", "definite_sg": "fúllwa", "definite_pl": "fúllun", "english": "flower"},
+        {"bare": "holom", "definite_sg": "holommwa", "definite_pl": "holommun", "english": "pen"}
+      ]
+    },
+    "NC2": {
+      "label": "Inanimate / abstract nouns",
+      "singular_definite_suffix": "-an",
+      "plural_definite_suffix": "-un",
+      "singular_indefinite": "ekkan",
+      "plural_indefinite": "okkol",
+      "examples": [
+        {"bare": "gór", "definite_sg": "górgan", "definite_pl": "górgun", "english": "house"}
+      ]
+    }
+  },
+
+  "case_system": {
+    "cases": [
+      {"name": "Absolutive", "marker": "unmarked (bare form)", "function": "Subject of intransitive; indefinite/inanimate object"},
+      {"name": "Ergative", "marker": "-e", "function": "Subject of transitive clause (agent)"},
+      {"name": "Genitive", "marker": "-r", "function": "Possession ('of')"},
+      {"name": "Dative", "marker": "-re", "function": "Indirect object"},
+      {"name": "Ablative", "marker": "-ttu", "function": "Movement away, source ('from/to')"},
+      {"name": "Locative", "marker": "-t", "function": "Spatial (place) or temporal (time)"},
+      {"name": "Benefactive", "marker": "-lla", "function": "Beneficiary ('for')"},
+      {"name": "Instrumental", "marker": "-e", "function": "Means of accomplishment ('by')"}
+    ]
+  },
+
+  "verb_conjugation": {
+    "note": "Verbs conjugate for person agreement and tense via suffixes on the verb root.",
+    "tenses": {
+      "simple_present": {
+        "markers": {"1p": "-i", "2p_nhon": "-os", "2p_hon": "-o", "3p": "-e"},
+        "example_root": "gor- (do)",
+        "forms": {"1p": "gori", "2p_nhon": "goros", "2p_hon": "goro", "3p": "gore"}
+      },
+      "present_progressive": {
+        "markers": {"1p": "-ir", "2p": "-or", "3p": "-er"},
+        "example_root": "gor- (do)",
+        "forms": {"1p": "gorir", "2p": "goror", "3p": "gorer"}
+      },
+      "present_perfect": {
+        "markers": {"1p": "-iyi", "2p": "-iyo", "3p": "-iye"},
+        "example_root": "gor- (do)",
+        "forms": {"1p": "goijji", "2p": "goijjo", "3p": "goijje"}
+      },
+      "simple_future": {
+        "markers": {"1p": "-iyum", "2p": "-iba", "3p": "-ibo"},
+        "example_root": "gor- (do)",
+        "forms": {"1p": "goriyum", "2p": "goriba", "3p": "goribo"}
+      }
+    }
+  },
+
+  "postpositions": [
+    {"rohingya": "baire", "english": "out, outside"},
+    {"rohingya": "butore", "english": "in, inside"},
+    {"rohingya": "ḍake", "english": "beside, near"},
+    {"rohingya": "fisottu", "english": "behind"},
+    {"rohingya": "fokke", "english": "for"},
+    {"rohingya": "fũwatti", "english": "with"},
+    {"rohingya": "hãse", "english": "near"},
+    {"rohingya": "maze", "english": "among, between"},
+    {"rohingya": "mikka", "english": "towards"},
+    {"rohingya": "munttu", "english": "before, in front of"},
+    {"rohingya": "nise", "english": "under"},
+    {"rohingya": "uwore", "english": "on, upon"},
+    {"rohingya": "uzu", "english": "to, toward"},
+    {"rohingya": "tole", "english": "under"}
+  ],
+
+  "numerals": {
+    "cardinal": [
+      {"number": 1, "bare": "ek", "NC1": "ekzon/uggwa", "NC2": "ekkan"},
+      {"number": 2, "bare": "dui", "NC1": "duizon/duwa", "NC2": "duiyan"},
+      {"number": 3, "bare": "tin", "NC1": "tinzon/tinnwa", "NC2": "tinnan"},
+      {"number": 4, "bare": "sair", "NC1": "sairzon/sairgwa", "NC2": "sairgan"},
+      {"number": 5, "bare": "fãz", "NC1": "fãzzon/fãzzwa", "NC2": "fãzzan"},
+      {"number": 6, "bare": "so", "NC1": "sozon/sowa", "NC2": "sowan"},
+      {"number": 7, "bare": "hãt", "NC1": "hãtzon/hãttwa", "NC2": "hãttan"},
+      {"number": 8, "bare": "ašṭo", "NC1": "ãšṭozon/ãšṭowa", "NC2": "ãšṭowan"},
+      {"number": 9, "bare": "no", "NC1": "nozon/nowa", "NC2": "nowan"},
+      {"number": 10, "bare": "doš", "NC1": "došzon/doššwa", "NC2": "doššan"},
+      {"number": 20, "bare": "kuri", "NC1": "kurizon", "NC2": "kuriwan"},
+      {"number": 100, "bare": "ekšot", "NC1": "ekšotzon", "NC2": "ekšottan"},
+      {"number": 1000, "bare": "ekhazar", "NC1": "ekhazarzon", "NC2": "ekhazargan"}
+    ],
+    "ordinal": [
+      {"english": "first", "rohingya": "foila"},
+      {"english": "second", "rohingya": "dusora"},
+      {"english": "third", "rohingya": "tisera"},
+      {"english": "fourth", "rohingya": "sair lombor"},
+      {"english": "fifth", "rohingya": "fãz lombor"}
+    ]
+  },
+
+  "common_phrases": [
+    {"rohingya": "Assólamu aláikum", "english": "Peace be upon you (greeting)"},
+    {"rohingya": "Ãr nam ...", "english": "My name is ..."},
+    {"rohingya": "Tũi kén?", "english": "Who are you?"},
+    {"rohingya": "Tũi hoñóttu?", "english": "Where are you from?"},
+    {"rohingya": "Ãi bala asír.", "english": "I am fine."},
+    {"rohingya": "Cúkuria", "english": "Thank you"}
+  ],
+
+  "vowels": {
+    "oral": ["a", "e", "i", "o", "u"],
+    "nasalized": ["ã", "ẽ", "ĩ", "õ", "ũ"],
+    "stressed_marker": "acute accent (á, é, í, ó, ú)",
+    "diphthongs": ["ai", "ei", "oi", "ou", "ui", "ãi", "ũi"]
+  },
+
+  "special_consonants_rohingyalish": [
+    {"letter": "c", "sound": "sh (as in ship)", "ipa": "/ʃ/"},
+    {"letter": "ç", "sound": "tongue-rolling r", "ipa": "/ɽ/"},
+    {"letter": "ñ", "sound": "nasal n (half n)", "ipa": "/ɲ/"},
+    {"letter": "dh", "sound": "aspirated d", "ipa": "/dʱ/"},
+    {"letter": "th", "sound": "aspirated t", "ipa": "/tʱ/"},
+    {"letter": "kh", "sound": "aspirated k", "ipa": "/kʱ/"},
+    {"letter": "ch", "sound": "aspirated ch", "ipa": "/tʃʱ/"},
+    {"letter": "ts", "sound": "thin ts", "ipa": "/ts/"},
+    {"letter": "ñg", "sound": "nasal ng", "ipa": "/ŋ/"},
+    {"letter": "ñy", "sound": "nasal ny", "ipa": "/ɲ/"}
+  ],
+
+  "clause_types": [
+    {
+      "type": "Intransitive",
+      "pattern": "S V",
+      "example": {"rohingya": "Moriyam handil.", "english": "Moriyam wept."}
+    },
+    {
+      "type": "Transitive",
+      "pattern": "S O V",
+      "example": {"rohingya": "Ãi hana hair.", "english": "I am eating food."}
+    },
+    {
+      "type": "Attributive",
+      "pattern": "NP COP ATP",
+      "example": {"rohingya": "Ei fúllwa oilde beši šundor.", "english": "This flower is very beautiful."}
+    },
+    {
+      "type": "Equative",
+      "pattern": "Subject COP NP",
+      "example": {"rohingya": "Hibar nam oilde Habiba.", "english": "Her name is Habiba."}
+    },
+    {
+      "type": "Possessive",
+      "pattern": "Subject-ABL ... ase",
+      "example": {"rohingya": "Ãttu tin boin ase.", "english": "I have three sisters."}
+    }
+  ],
+
+  "source": "Compiled from learnrohingya.com/references/a-brief-grammar-of-rohingya/ and rohingyalanguage.com"
+}
