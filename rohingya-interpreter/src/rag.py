@@ -69,6 +69,20 @@ class RAGRetriever:
             self._embedder = SentenceTransformer(self.embedding_model_name)
         return self._embedder
 
+    @staticmethod
+    def _deduplicate_ids(ids: list[str]) -> list[str]:
+        """Ensure unique IDs by appending _1, _2, ... for duplicates."""
+        seen: dict[str, int] = {}
+        result = []
+        for id_ in ids:
+            if id_ not in seen:
+                seen[id_] = 0
+                result.append(id_)
+            else:
+                seen[id_] += 1
+                result.append(f"{id_}_{seen[id_]}")
+        return result
+
     def _get_collection(self, direction: Direction):
         """Get or create Chroma collection for the given direction."""
         if self._client is None:
@@ -90,10 +104,20 @@ class RAGRetriever:
         if not docs:
             return
         texts = [d["text"] for d in docs]
-        ids = [d["id"] for d in docs]
+        raw_ids = [d["id"] for d in docs]
+        # ChromaDB requires unique IDs; corpus may have duplicates (e.g. rhg2en truncation)
+        ids = self._deduplicate_ids(raw_ids)
         embeddings = self.embedder.encode(texts, show_progress_bar=True, batch_size=128)
         coll = self._get_collection(direction)
-        coll.add(ids=ids, embeddings=embeddings.tolist(), documents=texts)
+        # ChromaDB has a max batch size (~5461); add in chunks to avoid ValueError
+        max_batch = 5000
+        for i in range(0, len(ids), max_batch):
+            end = min(i + max_batch, len(ids))
+            coll.add(
+                ids=ids[i:end],
+                embeddings=embeddings[i:end].tolist(),
+                documents=texts[i:end],
+            )
 
     def ensure_index(self, direction: Direction) -> None:
         """Ensure index exists; build if missing."""
