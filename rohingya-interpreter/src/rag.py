@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -12,6 +13,9 @@ from sentence_transformers import SentenceTransformer
 
 
 Direction = Literal["en2rhg", "rhg2en"]
+
+# Words to skip in per-word retrieval (articles rarely have standalone dictionary entries)
+EN_SKIP_WORDS = frozenset({"a", "an", "the"})
 
 # Paths relative to rohingya-interpreter root
 ROOT = Path(__file__).resolve().parent.parent
@@ -125,27 +129,72 @@ class RAGRetriever:
         if coll.count() == 0:
             self._build_index(direction)
 
+    @staticmethod
+    def _tokenize_for_retrieval(text: str, direction: Direction) -> list[str]:
+        """Extract meaningful tokens for per-word retrieval."""
+        # Simple tokenization: split on non-alphanumeric, keep words 2+ chars
+        words = re.findall(r"[a-zA-Zãẽĩõũñçáéíóúàèìòùâêîôû]+", text, re.IGNORECASE)
+        if direction == "en2rhg":
+            return [w for w in words if len(w) >= 2 and w.lower() not in EN_SKIP_WORDS]
+        return [w for w in words if len(w) >= 2]
+
     def retrieve(
         self,
         query: str,
         direction: Direction,
         top_k: int | None = None,
     ) -> list[str]:
-        """Retrieve top-k relevant dictionary entries as text snippets."""
+        """Retrieve top-k relevant dictionary entries as text snippets.
+
+        For sentences (multiple words), runs retrieval on the full sentence AND on
+        individual content words, then merges and deduplicates. This ensures we get
+        dictionary entries for all words in the sentence, not just the top-K for the
+        whole phrase.
+        """
         k = top_k or self.top_k
         self.ensure_index(direction)
         coll = self._get_collection(direction)
         n = coll.count()
         if n == 0:
             return []
-        query_embedding = self.embedder.encode([query]).tolist()
-        results = coll.query(
-            query_embeddings=query_embedding,
-            n_results=min(k, n),
-        )
-        if results and results.get("documents") and results["documents"][0]:
-            return results["documents"][0]
+
+        tokens = self._tokenize_for_retrieval(query, direction)
+        is_sentence = len(tokens) >= 2
+
+        if is_sentence:
+            # Multi-query retrieval: whole sentence + each significant word
+            k_per_query = max(3, k // (len(tokens) + 1))
+            all_queries = [query] + tokens
+            all_embeddings = self.embedder.encode(all_queries, show_progress_bar=False)
+            seen: set[str] = set()
+            merged: list[str] = []
+            for i, q in enumerate(all_queries):
+                emb = [all_embeddings[i].tolist()]
+                results = coll.query(
+                    query_embeddings=emb,
+                    n_results=min(k_per_query, n),
+                )
+                if results and results.get("documents") and results["documents"][0]:
+                    for doc in results["documents"][0]:
+                        if doc not in seen:
+                            seen.add(doc)
+                            merged.append(doc)
+            return merged[:k * 2]  # Allow more context for sentences
+        else:
+            # Single word/phrase: standard retrieval
+            query_embedding = self.embedder.encode([query]).tolist()
+            results = coll.query(
+                query_embeddings=query_embedding,
+                n_results=min(k, n),
+            )
+            if results and results.get("documents") and results["documents"][0]:
+                return results["documents"][0]
         return []
+
+
+def _extract_tokens(text: str) -> list[str]:
+    """Extract alphanumeric tokens from text."""
+    return [w for w in re.findall(r"[a-zA-Zãẽĩõũñçáéíóúàèìòùâêîôû]+", text) if len(w) >= 2]
 
 
 def dict_fallback_lookup(
@@ -153,19 +202,52 @@ def dict_fallback_lookup(
     direction: Direction,
     dictionary: list[dict] | None = None,
 ) -> list[str]:
-    """Exact or substring lookup in dictionary when retrieval misses."""
+    """Exact or substring lookup in dictionary when retrieval misses.
+
+    For multi-word input, also looks up each word individually to gather
+    translations for sentence building.
+    """
     dictionary = dictionary or load_dictionary()
     text_lower = text.lower().strip()
-    matches = []
+    seen: set[str] = set()
+    matches: list[str] = []
+
+    def add_match(s: str) -> None:
+        if s not in seen:
+            seen.add(s)
+            matches.append(s)
+
+    # Whole-phrase match first
     for entry in dictionary:
         en = (entry.get("english") or "").lower()
         rhg_list = entry.get("rohingya") or []
         if direction == "en2rhg":
             if text_lower in en or en in text_lower:
                 for r in rhg_list:
-                    matches.append(f"English: {entry['english']} -> Rohingya: {r}")
+                    add_match(f"English: {entry['english']} -> Rohingya: {r}")
         else:
             for r in rhg_list:
                 if text_lower in r.lower() or r.lower() in text_lower:
-                    matches.append(f"Rohingya: {r} -> English: {entry['english']}")
-    return matches[:5]  # Limit fallback results
+                    add_match(f"Rohingya: {r} -> English: {entry['english']}")
+
+    # For sentences: also look up each word individually (handles "eating" -> "eat")
+    tokens = _extract_tokens(text_lower)
+    if len(tokens) >= 2:
+        for word in tokens:
+            if word in {"a", "an", "the"}:
+                continue
+            for entry in dictionary:
+                en = (entry.get("english") or "").lower()
+                rhg_list = entry.get("rohingya") or []
+                if direction == "en2rhg":
+                    # Match: exact, or word/entry share stem (e.g. eating <-> eat)
+                    en_word = en.split()[0] if en else ""
+                    if word == en or en == word or word in en or en in word or word == en_word:
+                        for r in rhg_list:
+                            add_match(f"English: {entry['english']} -> Rohingya: {r}")
+                else:
+                    for r in rhg_list:
+                        if word in r.lower() or r.lower() in word:
+                            add_match(f"Rohingya: {r} -> English: {entry['english']}")
+
+    return matches[:15]  # Allow more for sentence context

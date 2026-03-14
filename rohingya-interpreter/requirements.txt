@@ -7,3 +7,6 @@ openai>=1.0.0
 # Vector store and embeddings
 chromadb>=0.4.0
 sentence-transformers>=2.2.0
+
+# Evaluation (for eval_sentences.py)
+openpyxl>=3.0.0

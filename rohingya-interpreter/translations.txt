@@ -1,0 +1,39 @@
+go	za
+come	ai, aiyó
+make	bana
+take	lo
+get	hãñsil gorér
+give	de
+find	tuailo
+tell	hoó
+work	ham
+call	dhak
+try	kucícgor
+ask	fusárgor
+need	zorurot
+feel	maásusgor
+leave	félairak
+put	rak
+keep	rak, rakó, rahó
+let	ejazot de
+bad	bura
+big	dhoóñr
+small	cóñço
+new	noya
+old	burá
+high	usol
+low	niso
+different	forók
+same	samé
+important	ahámíyot
+Good evening	Ázinna házinná
+How are you?	yakén
+Nice to meet you	Ça ór dola ór nizor
+Can you help me?	Tuáñrattu modot añáttu
+I need help	modot tuo
+Please help me	modot tuo ña
+Could you repeat that?	Hite dubaragor ñãi?
+I am hungry	búkah
+I am thirsty	fanír tirác laiggéde
+I am sick	ocúkóiye
+I need water	faní hana laiggéde

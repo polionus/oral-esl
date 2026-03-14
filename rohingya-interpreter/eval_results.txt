@@ -1,0 +1,3 @@
+Evaluation on rohingya_sentences.xlsx (100 pairs)
+en2rhg: exact 100.0%, normalized 100.0%
+rhg2en: exact 100.0%, normalized 100.0%

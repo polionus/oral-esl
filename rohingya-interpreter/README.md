@@ -59,9 +59,9 @@ english = interp.to_english("Ãi hana hair.")
 
 ## How It Works
 
-1. **RAG**: Your input is embedded and used to retrieve the top-K relevant entries from the dictionary (rag_corpus.json).
-2. **Grammar**: Rohingya grammar rules (SOV, pronouns, noun classes) are loaded from grammar_notes.json and added to the system prompt.
-3. **LLM**: The local model (via Ollama) receives the retrieved entries and grammar, then produces the translation.
+1. **RAG**: Your input is embedded and used to retrieve relevant entries from the dictionary (rag_corpus.json). For **sentences**, the system runs retrieval on both the full sentence and each content word, then merges results—ensuring dictionary coverage for all words.
+2. **Grammar**: Rohingya grammar rules (SOV, pronouns, noun classes, verb conjugation) are loaded from grammar_notes.json and added to the system prompt.
+3. **LLM**: The local model (via Ollama) receives the retrieved entries and grammar, then produces the translation. Output is cleaned to return only the translated text.
 
 The first run builds a ChromaDB index (stored in `.chroma/`), which can take a few minutes for ~275k documents. Later runs reuse the index.
 

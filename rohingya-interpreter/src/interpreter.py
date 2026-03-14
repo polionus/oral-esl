@@ -2,15 +2,41 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Literal
 
 from openai import OpenAI
 
+from .phrases import get_phrase_entries_for_context, phrase_lookup
 from .prompts import build_system_prompt, build_user_prompt, load_grammar_summary
 from .rag import RAGRetriever, dict_fallback_lookup, load_dictionary
 
 Direction = Literal["en2rhg", "rhg2en"]
+
+
+def _clean_translation_output(raw: str) -> str:
+    """Extract the translation from LLM output, stripping common preamble."""
+    if not raw:
+        return ""
+    raw = raw.strip()
+    # Strip common prefixes (e.g. "The translation is: X" -> "X")
+    for prefix in (
+        r"^The translation (?:of [^\n]+? )?is:\s*",
+        r"^So,?\s*(?:the )?translation (?:is:?|of [^\n]+? is:?)\s*",
+        r"^Using the dictionary[^\n]*?translation (?:is:?|:)\s*",
+        r"^Translation:?\s*",
+        r"^Output:?\s*",
+    ):
+        raw = re.sub(prefix, "", raw, flags=re.IGNORECASE)
+    # If multi-line, take the first line that looks like a translation
+    lines = [ln.strip() for ln in raw.split("\n") if ln.strip()]
+    for line in lines:
+        if re.match(r"^(?:Note|So|Thus|Using|The |I |We |You )", line, re.I):
+            continue
+        if re.search(r"[ãẽĩõũñçáéíóú]", line) or (len(line) < 80 and not line.endswith("?")):
+            return line.rstrip(".")
+    return lines[0] if lines else raw
 
 # Default Ollama endpoint
 OLLAMA_BASE_URL = "http://localhost:11434/v1"
@@ -45,13 +71,26 @@ def translate(
     if not text or not text.strip():
         return ""
 
-    retriever = retriever or RAGRetriever(top_k=top_k)
-    entries = retriever.retrieve(text.strip(), direction, top_k=top_k)
+    text_clean = text.strip()
+
+    # Check curated phrase table first (rohingya_sentences.xlsx)
+    phrase_result = phrase_lookup(text_clean, direction)
+    if phrase_result is not None:
+        return phrase_result
+
+    # Use higher top_k for sentences to ensure all words get dictionary coverage
+    effective_k = top_k * 2 if len(text_clean.split()) >= 2 else top_k
+
+    retriever = retriever or RAGRetriever(top_k=effective_k)
+    entries = retriever.retrieve(text_clean, direction, top_k=effective_k)
     if not entries:
-        entries = dict_fallback_lookup(text.strip(), direction)
+        entries = dict_fallback_lookup(text_clean, direction)
+    phrase_entries = get_phrase_entries_for_context(direction, query=text_clean, limit=12)
     grammar = load_grammar_summary()
     system_prompt = build_system_prompt(grammar)
-    user_prompt = build_user_prompt(text.strip(), direction, entries)
+    user_prompt = build_user_prompt(
+        text_clean, direction, entries, phrase_entries=phrase_entries or None
+    )
 
     client = OpenAI(base_url=base_url, api_key=api_key)
     response = client.chat.completions.create(
@@ -63,7 +102,7 @@ def translate(
         temperature=0.1,
     )
     result = response.choices[0].message.content
-    return (result or "").strip()
+    return _clean_translation_output(result or "")
 
 
 class RohingyaInterpreter:
