@@ -1,59 +1,209 @@
 .container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  gap: 20px;
+  padding: 60px 24px;
 }
 
 h1 {
   font-size: 2.4rem;
   font-weight: 600;
   color: var(--text-h);
-  margin: 0 0 12px;
+  margin: 0;
 }
 
-.text-field {
-  width: 400px;
-  max-width: 90vw;
-  padding: 14px 18px;
-  font-size: 1rem;
-  font-family: inherit;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-h);
-  outline: none;
-  transition: border-color 0.25s;
+.pointing-hand {
+  font-size: 2.2rem;
+  margin: 8px 0 40px;
+  animation: poke 1.2s ease-in-out infinite;
+  display: inline-block;
 }
 
-.text-field::placeholder {
-  color: var(--text);
-  opacity: 0.6;
+@keyframes poke {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
 }
 
-.text-field:focus {
-  border-color: var(--accent);
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 36px 32px;
+  max-width: 540px;
+  width: 100%;
 }
 
-.submit-btn {
-  padding: 12px 40px;
-  font-size: 1rem;
-  font-family: inherit;
-  font-weight: 500;
-  color: #fff;
-  background: var(--accent);
+.category-grid .category-item:last-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: none;
   border: none;
-  border-radius: 10px;
   cursor: pointer;
-  transition: opacity 0.25s, transform 0.15s;
+  padding: 0;
+  font-family: inherit;
 }
 
-.submit-btn:hover {
-  opacity: 0.85;
+.category-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.25s, background 0.25s, transform 0.15s, box-shadow 0.25s;
+  color: var(--accent);
 }
 
-.submit-btn:active {
+.category-circle svg,
+.category-circle img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.icon-mask {
+  display: block;
+  width: 46px;
+  height: 46px;
+  background-color: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.category-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-h);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.category-item:hover .category-circle {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transform: scale(1.07);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.category-item:active .category-circle {
   transform: scale(0.97);
+}
+
+.title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.title-icon svg,
+.title-icon img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.title-icon .icon-mask {
+  width: 56px;
+  height: 56px;
+}
+
+.back-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--accent);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.back-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.back-btn:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.sub-grid {
+  display: flex;
+  gap: 60px;
+  justify-content: center;
+}
+
+.sub-grid .category-circle {
+  width: 120px;
+  height: 120px;
+}
+
+.sub-grid .category-circle svg,
+.sub-grid .category-circle img,
+.sub-grid .category-circle .icon-mask {
+  width: 52px;
+  height: 52px;
+}
+
+.sub-grid .category-label {
+  font-size: 1rem;
+}
+
+@media (max-width: 480px) {
+  .sub-grid {
+    gap: 36px;
+  }
+
+  .sub-grid .category-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .sub-grid .category-circle svg,
+  .sub-grid .category-circle img,
+  .sub-grid .category-circle .icon-mask {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-grid {
+    gap: 28px 24px;
+  }
+
+  .category-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .category-circle svg,
+  .category-circle img,
+  .category-circle .icon-mask {
+    width: 36px;
+    height: 36px;
+  }
 }
